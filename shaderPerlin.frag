@@ -35,6 +35,7 @@ uniform float shininess;
 uniform int octave;
 uniform float persistence;
 uniform float f0;
+uniform float t;
 
 ///////////////////////////////////////////////
 ///////
@@ -128,30 +129,33 @@ float PerlinNoise_4D(float x, float y, float z, float t)
 }
 
 void main(void) {
-  gl_FragColor = vec4 (0.0, 0.0, 0.0, 1);
+	gl_FragColor = vec4 (0.0, 0.0, 0.0, 1);
 
-  vec3 p = vec3 (gl_ModelViewMatrix * P);
+	vec3 c1 = {0.5, 0.5, 0.7}; // shiny grey
+	vec3 c2 = {0.3,0.3,0.3}; // white
+	vec3 p = vec3 (gl_ModelViewMatrix * P);
 
-  // PERLIN NOISE
+	// PERLIN NOISE
 
-  float noise_perlin = (PerlinNoise_4D(P.x*10.0, P.y*10.0, P.z*10.0, 0) + 1.0)/2.0; // TODO let time fly...
-  gl_FragColor.rgb += noise_perlin;
+	float c = (PerlinNoise_4D(P.x, P.y, P.z, t) + 1.0)/2.0;
+	float value = 1 - sqrt(abs(sin(2 * 3.141592 *c)));
+	gl_FragColor.rgb += (c1.r * (1 - value) + c2.r * value, c1.g * (1 - value) + c2.g * value, c1.b * (1 - value) + c2.b * value);
 
-  // BRDF
-  vec3 n = normalize (gl_NormalMatrix * N);
-  vec3 l = normalize (gl_LightSource[0].position.xyz - p);
+	// BRDF
+	vec3 n = normalize (gl_NormalMatrix * N);
+	vec3 l = normalize (gl_LightSource[0].position.xyz - p);
 
-  vec3 r = reflect (-l, n);
-  vec3 v = normalize (-p);
+	vec3 r = reflect (-l, n);
+	vec3 v = normalize (-p);
 
-  float diffuse = max(0.0,dot(n, l));
-  float spec = pow(max(0.0, dot(r, v)), shininess);
+	float diffuse = max(0.0,dot(n, l));
+	float spec = pow(max(0.0, dot(r, v)), shininess);
 
-  vec4 LightContribution =  diffuseRef * diffuse * gl_LightSource[0].diffuse + 
-                            specRef * spec * gl_LightSource[0].specular;
+	vec4 LightContribution =  diffuseRef * diffuse * gl_LightSource[0].diffuse + 
+		specRef * spec * gl_LightSource[0].specular;
 
 
-  gl_FragColor += vec4(LightContribution.xyz, 1);
+	gl_FragColor += vec4(LightContribution.xyz, 1);
 
 
 }

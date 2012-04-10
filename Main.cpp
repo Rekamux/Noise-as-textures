@@ -118,6 +118,7 @@ inline void glDrawPoint (const Vertex & v) {
 static int nbOctave = 4;
 static float persistence = 0.5;
 static int f0 = 1.0;
+static float perlinTime = 0;
 
 // gabor properties
 static float K = 1.0f;
@@ -152,7 +153,8 @@ void setShaderValues () {
     // perlin
     perlinShader->setnbOctave (nbOctave);
     perlinShader->setPersistence (persistence);
-    perlinShader->setF0 (f0);
+    perlinShader->setF0 (f0); 
+	perlinShader->setTime(perlinTime);
 
     // brdf
     shader->setDiffuseRef (diffuseRef);
@@ -348,6 +350,7 @@ void display () {
         drawPhongModel ();
     glFlush ();
     glutSwapBuffers ();
+	setShaderValues();
 }
 
 void idle () {
@@ -355,7 +358,8 @@ void idle () {
     static unsigned int counter = 0;
     counter++;
     float currentTime = glutGet ((GLenum)GLUT_ELAPSED_TIME);
-    if (currentTime - lastTime >= 1000.0f) {
+	float elapsed = currentTime - lastTime;
+    if (elapsed >= 1000.0f) {
         FPS = counter;
         counter = 0;
         static char FPSstr [128];
@@ -370,6 +374,7 @@ void idle () {
         lastTime = currentTime;
     
     }
+	perlinTime+=counter?elapsed/(float)(counter*10000):0;
     glutPostRedisplay ();
 }
 

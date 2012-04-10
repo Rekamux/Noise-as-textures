@@ -56,7 +56,11 @@ class PerlinShader : public PhongShader {
 
 		void setPersistence (float s) {
 			glUniform1fARB (persistenceLocation, s); 
-		}   
+		}
+
+		void setTime(float t) {
+			glUniform1fARB(timeLocation, t);
+		}
 
 	private:
 		void init (const std::string & vertexShaderFilename,
@@ -67,12 +71,14 @@ class PerlinShader : public PhongShader {
 			nbOctaveLocation = getUniLoc ("octave");
 			persistenceLocation = getUniLoc ("persistence");
 			f0Location = getUniLoc ("f0");
+			timeLocation = getUniLoc("t");
 		}
 
 		// perlin
 		GLint nbOctaveLocation;
 		GLint persistenceLocation;
 		GLint f0Location;
+		GLint timeLocation;
 };
 
 class WaveletShader : public PhongShader

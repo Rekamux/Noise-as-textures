@@ -25,7 +25,6 @@ class PhongShader : public Shader
 		void init (const std::string & vertexShaderFilename,
 				const std::string & fragmentShaderFilename) {
 			loadFromFile (vertexShaderFilename, fragmentShaderFilename);
-			bind ();
 
 			// brdf uniform var
 			specRefLocation = getUniLoc ("specRef");

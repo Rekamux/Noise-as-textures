@@ -20,6 +20,9 @@
 //                                                                          
 // --------------------------------------------------------------------------
 
+#extension GL_EXT_gpu_shader4 : enable
+#extension GL_ARB_gpu_shader5 : enable
+
 varying vec4 P;
 varying vec3 N;
 
@@ -67,7 +70,7 @@ float unif(float min, float max) {
 uint poisson(float mean)
 {
   float g_ = exp(-mean);
-  uint em = 0;
+  uint em = uint(0);
   float t = uniform_0_1();
   while (t > g_) {
     ++em;
@@ -88,9 +91,9 @@ float gabor(float omega, float x, float y)
 
 uint morton(uint x, uint y)
 {
-  uint z = 0;
-  for (uint i = 0; i < (4 * 8); ++i) {
-    z |= ((x & (1 << i)) << i) | ((y & (1 << i)) << (i + 1));
+  uint z = uint(0);
+  for (uint i = uint(0); i < uint(4 * 8); ++i) {
+    z |= ((x & (uint(1) << i)) << i) | ((y & (uint(1) << i)) << (i + uint(1)));
   }
   return z;
 }
@@ -103,8 +106,8 @@ float cell(int i, int j, float x, float y)
 
   uint seed_cell = morton(uint(i), uint(j));
 
-  if (seed_cell == 0) {
-    seed_cell = 1;
+  if (seed_cell == uint(0)) {
+    seed_cell = uint(1);
   }
   seed(seed_cell);
 
@@ -113,7 +116,7 @@ float cell(int i, int j, float x, float y)
   uint number_of_impulses = poisson(number_of_impulses_per_cell);
 
   float noise = 0.0;
-  for (uint i = 0; i < number_of_impulses; ++i) {
+  for (uint i = uint(0); i < number_of_impulses; ++i) {
     float x_i = uniform_0_1();
     float y_i = uniform_0_1();
     float w_i = unif(-1.0, +1.0);

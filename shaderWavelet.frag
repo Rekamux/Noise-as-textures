@@ -20,6 +20,9 @@
 //                                                                          
 // --------------------------------------------------------------------------
 
+#extension GL_EXT_gpu_shader4 : enable
+#extension GL_ARB_gpu_shader5 : enable
+
 varying vec4 P;
 varying vec3 N;
 
@@ -48,12 +51,7 @@ uniform int firstBand;
                 1.0/pow(2.0, 4),
                 };*/
 
-float W[5] = {  1.0,
-                0.9,
-                0.8,
-                0.7,
-                0.6,
-                };
+float W[5];
 
 int mod(int x, int n) {
   int m=x%n;
@@ -149,6 +147,12 @@ float multibandNoise(vec3 p, bool normal) {
 }
 
 void main(void) {
+	W[0] = 1.0;
+	W[1] = 0.9;
+	W[2] = 0.8;
+	W[3] = 0.7;
+	W[4] = 0.6;
+
 	gl_FragColor = vec4 (0.0, 0.0, 0.0, 1);
 
 	vec3 p = vec3 (gl_ModelViewMatrix * P);

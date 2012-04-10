@@ -412,7 +412,7 @@ void printUsage () {
 		<< " F: (PERLIN) increase the frequence" << endl
 		<< " f: (PERLIN) decrease the frequence" << endl
 		<<endl
-		<< " P: Switch to Wavelet noise" << endl 
+		<< " W: Switch to Wavelet noise" << endl 
 		<< " B: (WAVELET) increase the number of bands" << endl
 		<< " b: (WAVELET) decrease the number of bands" << endl
 		<< " R: (WAVELET) increase the first band" << endl

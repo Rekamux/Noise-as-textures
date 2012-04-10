@@ -20,6 +20,9 @@
 //                                                                          
 // --------------------------------------------------------------------------
 
+#extension GL_EXT_gpu_shader4 : enable
+#extension GL_ARB_gpu_shader5 : enable
+
 varying vec4 P;
 varying vec3 N;
 
@@ -59,15 +62,15 @@ float Noise4(int x, int y, int z, int t)
 	n += c*t;
 
 	n = (n<<13) ^ n;
-	return ( 1.0 - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);    
+	return 1.0 - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0;
 }
 
-float InterpolatedNoise2D(float x, float y, float z, float t)
+float InterpolatedNoise2D(float x, float y, int z, int t)
 {
-	int integer_X    = floor(x);
+	int integer_X    = int(floor(x));
 	float fractional_X = x - integer_X;
 
-	int integer_Y    = floor(y);
+	int integer_Y    = int(floor(y));
 	float fractional_Y = y - integer_Y;
 
 	float v1 = Noise4(integer_X,     integer_Y, z, t);
@@ -82,9 +85,9 @@ float InterpolatedNoise2D(float x, float y, float z, float t)
 	return Interpolate(i1 , i2 , fractional_Y);
 }
 
-float InterpolatedNoise3D(float x, float y, float z, float t)
+float InterpolatedNoise3D(float x, float y, float z, int t)
 {
-	int integer_Z    = floor(z);
+	int integer_Z    = int(floor(z));
 	float fractional_Z = z - integer_Z;
 
 	float v1 = InterpolatedNoise2D(x, y, integer_Z, t);
@@ -95,7 +98,7 @@ float InterpolatedNoise3D(float x, float y, float z, float t)
 
 float InterpolatedNoise4D(float x, float y, float z, float t)
 {
-	int integer_T    = floor(t);
+	int integer_T    = int(floor(t));
 	float fractional_T = t - integer_T;
 
 	float v1 = InterpolatedNoise3D(x, y, z, integer_T);
@@ -131,7 +134,7 @@ void main(void) {
 
   // PERLIN NOISE
 
-  float noise_perlin = (PerlinNoise_4D(P.x*10.0, P.y*10.0, P.z*10.0, 0) + 1.0)/2.0;
+  float noise_perlin = (PerlinNoise_4D(P.x*10.0, P.y*10.0, P.z*10.0, 0) + 1.0)/2.0; // TODO let time fly...
   gl_FragColor.rgb += noise_perlin;
 
   // BRDF
@@ -141,8 +144,8 @@ void main(void) {
   vec3 r = reflect (-l, n);
   vec3 v = normalize (-p);
 
-  float diffuse = max(0,dot(n, l));
-  float spec = pow(max(0, dot(r, v)), shininess);
+  float diffuse = max(0.0,dot(n, l));
+  float spec = pow(max(0.0, dot(r, v)), shininess);
 
   vec4 LightContribution =  diffuseRef * diffuse * gl_LightSource[0].diffuse + 
                             specRef * spec * gl_LightSource[0].specular;

@@ -319,7 +319,7 @@ void init (const std::string & filename) {
 		waveletShader->bind();
 		cout << "Setting default values...\n";
 		shader = perlinShader;
-        setShaderValues ();
+		setShaderValues ();
 		cout << "Current shader is Perlin\n";
     } catch (ShaderException e) {
         cerr << e.getMessage () << endl;
@@ -581,12 +581,13 @@ int main (int argc, char ** argv) {
     glutMotionFunc (motion);
     glutMouseFunc (mouse);
  
-    key ('?', 0, 0);   
+    key ('?', 0, 0);
 
     glDepthFunc (GL_LESS);
     glEnable (GL_DEPTH_TEST);
   
     shader->bind ();
+	setShaderValues();
     glutMainLoop ();
     return EXIT_SUCCESS;
 }

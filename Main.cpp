@@ -38,152 +38,9 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "Noise.h"
+#include "NoiseShaders.h"
 
 using namespace std;
-
-static Wavelet wNoise(2);
-
-class PhongShader : public Shader {
-public:
-    PhongShader () { init ("shader.vert", "shader.frag"); }
-    inline virtual ~PhongShader () {}
-
-    // Gabor properties
-    void setKRef (float s) {
-        glUniform1fARB (KRefLocation, s); 
-    }
-
-    void setARef (float s) {
-        glUniform1fARB (ARefLocation, s); 
-    }
-
-    void setOmegaRef (float s) {
-        glUniform1fARB (OmegaRefLocation, s); 
-    }
-
-    void setIsoRef (bool s) {
-        glUniform1fARB (IsoRefLocation, s); 
-    }
-
-    // Wavelet properties
-    void setnBandsRef (int s) {
-        glUniform1iARB (nBandsLocation, s); 
-    }
-
-    void setfirstBand (int s) {
-        glUniform1iARB (firstBandLocation, s); 
-    }
-
-    void setTileSize (int s) {
-        wNoise.generateNoiseTile(s);
-        glUniform1iARB (tileSizeLocation, s); 
-        setNoiseData(s);
-    }
-
-    void setNoiseprojected (bool s) {
-        glUniform1fARB (noiseProjectedLocation, s); 
-    }
- 
-    void sets (float s) {
-        glUniform1fARB (sLocation, s); 
-    }
-
-    // Perlin properties
-    void setnbOctave (int s) {
-        glUniform1iARB (nbOctaveLocation, s); 
-    }
-
-    void setF0 (float s) {
-        glUniform1fARB (f0Location, s); 
-    }   
-
-    void setPersistence (float s) {
-        glUniform1fARB (persistenceLocation, s); 
-    }   
-
-    // BRDF properties
-    void setDiffuseRef (float s) {
-        glUniform1fARB (diffuseRefLocation, s); 
-    }
-
-    void setSpecRef (float s) {
-        glUniform1fARB (specRefLocation, s); 
-    }
-
-    void setShininess (float s) {
-        glUniform1fARB (shininessLocation, s); 
-    }
-
-
-    // Change noise type in glsl
-    void setNoiseType (float s) {
-        glUniform1fARB (noiseTypeLocation, s); 
-    }   
-
-private:
-    void init (const std::string & vertexShaderFilename,
-               const std::string & fragmentShaderFilename) {
-        loadFromFile (vertexShaderFilename, fragmentShaderFilename);
-        bind ();
-        // gabor uniform var
-        KRefLocation = getUniLoc ("K");
-        OmegaRefLocation = getUniLoc ("omega_0");
-        ARefLocation = getUniLoc ("a");
-        IsoRefLocation = getUniLoc ("iso");
-
-        // brdf uniform var
-        specRefLocation = getUniLoc ("specRef");
-        diffuseRefLocation = getUniLoc ("diffuseRef");
-        shininessLocation = getUniLoc ("shininess");
-
-        // noise type uniform var
-        noiseTypeLocation = getUniLoc ("noise_type");
-
-        // wavelet uniform var
-        arrayLocation = getUniLoc ("noiseData");
-        nBandsLocation = getUniLoc ("nbands");
-        firstBandLocation = getUniLoc ("firstBand");
-        tileSizeLocation = getUniLoc ("noiseTileSize");
-        noiseProjectedLocation = getUniLoc ("noiseProjected");
-        sLocation = getUniLoc ("s");
-
-        // perlin uniform var
-        nbOctaveLocation = getUniLoc ("octave");
-        persistenceLocation = getUniLoc ("persistence");
-        f0Location = getUniLoc ("f0");
-    }
-
-    void setNoiseData(int s) {
-        glUniform1fvARB(arrayLocation, s*s*s, wNoise.noiseTileData);
-    }
-
-    // gabor
-    GLint KRefLocation;
-    GLint ARefLocation;
-    GLint OmegaRefLocation;
-    GLint IsoRefLocation;
-
-    // brdf
-    GLint diffuseRefLocation;
-    GLint specRefLocation;
-    GLint shininessLocation;
-
-    // noise type
-    GLint noiseTypeLocation;
-
-    // wavelet
-    GLint arrayLocation;
-    GLint nBandsLocation;
-    GLint firstBandLocation;
-    GLint tileSizeLocation;
-    GLint noiseProjectedLocation;
-    GLint sLocation;
-
-    // perlin
-    GLint nbOctaveLocation;
-    GLint persistenceLocation;
-    GLint f0Location;
-};
 
 static GLint window;
 static unsigned int SCREENWIDTH = 1024;
@@ -195,7 +52,10 @@ static bool mouseZoomPressed = false;
 static int lastX=0, lastY=0, lastZoom=0;
 static unsigned int FPS = 0;
 
-static PhongShader * phongShader;
+static PhongShader * shader;
+static PerlinShader * perlinShader;
+static GaborShader * gaborShader;
+static WaveletShader * waveletShader;
 
 static Mesh mesh;
 static GLuint glID;
@@ -275,38 +135,29 @@ static int tileSize = 2;
 static bool noiseProjected = false;
 static float s = 0.0;
 
-// noise_type:
-//  0: perlin
-//  1: wavelet
-//  2: gabor
-static float noise_type = 2.0;
-
 void setShaderValues () {
     // wavelet
-    phongShader->setTileSize (tileSize);
-    phongShader->setnBandsRef (nbands);
-    phongShader->setfirstBand (firstBand);
-    phongShader->setNoiseprojected (noiseProjected);
+    waveletShader->setTileSize (tileSize);
+    waveletShader->setnBandsRef (nbands);
+    waveletShader->setfirstBand (firstBand);
+    waveletShader->setNoiseprojected (noiseProjected);
+    waveletShader->sets (s);
 
     // gabor
-    phongShader->setKRef (K);
-    phongShader->setOmegaRef (omega);
-    phongShader->setARef (a);
-    phongShader->setIsoRef (iso);
-
-    // brdf
-    phongShader->setDiffuseRef (diffuseRef);
-    phongShader->setSpecRef (specRef);
-    phongShader->setShininess (shininess);
-
-    // noise type
-    phongShader->setNoiseType (noise_type);
+    gaborShader->setKRef (K);
+    gaborShader->setOmegaRef (omega);
+    gaborShader->setARef (a);
+    gaborShader->setIsoRef (iso);
 
     // perlin
-    phongShader->setnbOctave (nbOctave);
-    phongShader->setPersistence (persistence);
-    phongShader->setF0 (f0);
-    phongShader->sets (s);
+    perlinShader->setnbOctave (nbOctave);
+    perlinShader->setPersistence (persistence);
+    perlinShader->setF0 (f0);
+
+    // brdf
+    shader->setDiffuseRef (diffuseRef);
+    shader->setSpecRef (specRef);
+    shader->setShininess (shininess);
 }
 
 void drawMesh (bool flat) {
@@ -340,7 +191,7 @@ void drawSolidModel () {
     glPolygonOffset (1.0, 1.0);
     glEnable (GL_POLYGON_OFFSET_FILL);
     glShadeModel (GL_FLAT);
-    phongShader->bind ();
+    shader->bind ();
     drawMesh (true);    
     glPolygonMode (GL_FRONT, GL_LINE);
     glPolygonMode (GL_BACK, GL_FILL);
@@ -456,9 +307,20 @@ void init (const std::string & filename) {
     initGLList ();
     
     try {
-        phongShader = new PhongShader;
-        phongShader->bind ();
+		cout << "Binding shaders...\n";
+		cout << "Perlin...\n";
+        perlinShader = new PerlinShader;
+        perlinShader->bind ();
+		cout << "Gabor...\n";
+		gaborShader = new GaborShader;
+		gaborShader->bind();
+		cout << "Wavelet...\n";
+		waveletShader = new WaveletShader;
+		waveletShader->bind();
+		cout << "Setting default values...\n";
+		shader = perlinShader;
         setShaderValues ();
+		cout << "Current shader is Perlin\n";
     } catch (ShaderException e) {
         cerr << e.getMessage () << endl;
         exit (EXIT_FAILURE);
@@ -466,7 +328,9 @@ void init (const std::string & filename) {
 }
 
 void clear () {
-    delete phongShader;
+    delete perlinShader;
+    delete gaborShader;
+    delete waveletShader;
     glDeleteLists (glID, 1);
 }
 
@@ -545,98 +409,95 @@ void key (unsigned char keyPressed, int x, int y) {
     // gabor
     case 'A':
         a = min(0.1, a + 0.01);
-        phongShader->setARef(a);
+        gaborShader->setARef(a);
         break;
     case 'a':
         a = max(0.001, a - 0.01);
-        phongShader->setARef(a);
+        gaborShader->setARef(a);
         break;
     case 'w':
         omega += M_PI/10.0;
-        phongShader->setOmegaRef(omega);
+        gaborShader->setOmegaRef(omega);
         break;
     case 'i':
         iso = !iso;
-        phongShader->setIsoRef(iso);
+        gaborShader->setIsoRef(iso);
         break;
 
     // Noise type
     case 'P':
-        noise_type = 0.0;
-        phongShader->setNoiseType(noise_type);
+		shader = perlinShader;
         break;
     case 'W':
-        noise_type = 1.0;
-        phongShader->setNoiseType(noise_type);
+		shader = waveletShader;
         break;
     case 'G':
-        noise_type = 2.0;
-        phongShader->setNoiseType(noise_type);
+		shader = gaborShader;
         break;
 
     // Wavelet
     case 'B':
         nbands = min(5, nbands + 1);
-        phongShader->setnBandsRef(nbands);
+        waveletShader->setnBandsRef(nbands);
         break;
     case 'b':
         nbands = max(1, nbands - 1);
-        phongShader->setnBandsRef(nbands);
+        waveletShader->setnBandsRef(nbands);
         break;
     case 'R':
         firstBand = min(0, firstBand + 1);
-        phongShader->setfirstBand(firstBand);
+        waveletShader->setfirstBand(firstBand);
         break;
     case 'r':
         firstBand = max(-10, firstBand - 1);
-        phongShader->setfirstBand(firstBand);
+        waveletShader->setfirstBand(firstBand);
         break;
     case 'T':
         tileSize = min(6, tileSize + 2);
-        phongShader->setTileSize(tileSize);
+        waveletShader->setTileSize(tileSize);
         break;
     case 't':
         tileSize = max(2, tileSize - 2);
-        phongShader->setTileSize(tileSize);
+        waveletShader->setTileSize(tileSize);
         break;
     case 'p':
         noiseProjected = !noiseProjected;
-        phongShader->setNoiseprojected(noiseProjected);
+        waveletShader->setNoiseprojected(noiseProjected);
         break;
     case 'S':
         s = min(0.0, s + 1.0);
-        phongShader->sets(s);
+        waveletShader->sets(s);
         break;
     case 's':
         s = max(-10.0, s - 1.0);
-        phongShader->sets(s);
+        waveletShader->sets(s);
         break;
 
 
     // perlin
     case 'O':
         nbOctave = min(8, nbOctave + 1);
-        phongShader->setnbOctave(nbOctave);
+        perlinShader->setnbOctave(nbOctave);
         break;
     case 'o':
         nbOctave = max(1, nbOctave - 1);
-        phongShader->setnbOctave(nbOctave);
+        perlinShader->setnbOctave(nbOctave);
         break;
     case 'E':
         persistence = min(0.9, persistence + 0.05);
-        phongShader->setPersistence(persistence);
+        perlinShader->setPersistence(persistence);
         break;
     case 'e':
         persistence = max(0.1, persistence - 0.05);
-        phongShader->setPersistence(persistence);
+        perlinShader->setPersistence(persistence);
         break;
     case 'F':
         f0 = min(10.0, f0 + 1.0);
-        phongShader->setF0(f0);
+        perlinShader->setF0(f0);
         break;
     case 'f':
         f0 = max(1.0, f0 - 1.0);
-        phongShader->setF0(f0);
+        perlinShader->setF0(f0);
         break;
 
     case '?':
@@ -725,7 +586,7 @@ int main (int argc, char ** argv) {
     glDepthFunc (GL_LESS);
     glEnable (GL_DEPTH_TEST);
   
-    phongShader->bind ();
+    shader->bind ();
     glutMainLoop ();
     return EXIT_SUCCESS;
 }

@@ -173,7 +173,7 @@ void Shader::printShaderInfoLog (GLuint shader) {
       exit(1);
     }
     glGetShaderInfoLog (shader, infologLength, &charsWritten, infoLog);
-    //    cerr << "InfoLog:" << endl << infoLog << endl << endl;
+	cerr << "InfoLog:" << endl << infoLog << endl << endl;
     delete [] infoLog;
   }
   printOpenGLError();  // Check for OpenGL errors
@@ -195,7 +195,7 @@ void Shader::printProgramInfoLog (GLuint program) {
       exit(1);
     }
     glGetProgramInfoLog (program, infologLength, &charsWritten, infoLog);
-    //cerr << "InfoLog:" << endl << infoLog << endl << endl;
+	cerr << "InfoLog:" << endl << infoLog << endl << endl;
     delete [] infoLog;
   }
   printOpenGLError();  // Check for OpenGL errors

@@ -445,101 +445,128 @@ void key (unsigned char keyPressed, int x, int y) {
 	// Phong
 	case 'D':
 		diffuseRef = min(2.0f, diffuseRef+0.1f);
+		cout << "PHONG: new diffuse ref: " << diffuseRef << endl;
 		break;
 	case 'd':
 		diffuseRef = max(0.0f, diffuseRef-0.1f);
+		cout << "PHONG: new diffuse ref: " << diffuseRef << endl;
 		break;
 	case 'C':
 		specRef = min(3.0f, specRef+0.1f);
+		cout << "PHONG: new spec ref: " << specRef << endl;
 		break;
 	case 'c':
 		specRef = max(0.0f, specRef-0.1f);
+		cout << "PHONG: new spec ref: " << specRef << endl;
 		break;
 	case 'N':
 		shininess = min(30.0f, shininess+1.0f);
+		cout << "PHONG: new shininess: " << shininess << endl;
 		break;
 	case 'n':
 		shininess = max(0.0f, shininess-1.0f);
+		cout << "PHONG: new shininess: " << shininess << endl;
 		break;
 
 
     // gabor
     case 'A':
         a = min(0.1, a + 0.01);
+		cout << "GABOR: new a: " << a << endl;
         break;
     case 'a':
         a = max(0.001, a - 0.01);
+		cout << "GABOR: new a: " << a << endl;
         break;
     case 'w':
         omega += M_PI/10.0;
+		cout << "GABOR: new omega: " << omega << endl;
         break;
     case 'i':
         iso = !iso;
+		cout << "GABOR: is iso: " << iso << endl;
         break;
 
     // Noise type
     case 'P':
 		shader = perlinShader;
 		shader->bind();
+		cout << "Applying Perlin noise" << endl;
         break;
     case 'W':
 		shader = waveletShader;
 		shader->bind();
+		cout << "Applying Wavelet noise" << endl;
         break;
     case 'G':
 		shader = gaborShader;
 		shader->bind();
+		cout << "Applying Gabor noise" << endl;
         break;
 
     // Wavelet
     case 'B':
         nbands = min(5, nbands + 1);
+		cout << "WAVELET: number of bands: " << nbands << endl;
         break;
     case 'b':
         nbands = max(1, nbands - 1);
+		cout << "WAVELET: number of bands: " << nbands << endl;
         break;
     case 'R':
         firstBand = min(0, firstBand + 1);
+		cout << "WAVELET: first bands: " << firstBand << endl;
         break;
     case 'r':
         firstBand = max(-10, firstBand - 1);
+		cout << "WAVELET: first bands: " << firstBand << endl;
         break;
     case 'T':
         tileSize = min(6, tileSize + 2);
+		cout << "WAVELET: tile size: " << tileSize << endl;
         break;
     case 't':
         tileSize = max(2, tileSize - 2);
+		cout << "WAVELET: tile size: " << tileSize << endl;
         break;
     case 'p':
         noiseProjected = !noiseProjected;
-		cout << "Is noise projected: " << noiseProjected << endl;
+		cout << "WAVELET: is noise projected: " << noiseProjected << endl;
         break;
     case 'S':
         s = min(0.0, s + 1.0);
+		cout << "WAVELET: tile size: " << tileSize << endl;
         break;
     case 's':
         s = max(-10.0, s - 1.0);
+		cout << "WAVELET: s: " << s << endl;
         break;
 
 
     // perlin
     case 'O':
         nbOctave = min(8, nbOctave + 1);
+		cout << "PERLIN: number of octaves: " << nbOctave << endl;
         break;
     case 'o':
         nbOctave = max(1, nbOctave - 1);
+		cout << "PERLIN: number of octaves: " << nbOctave << endl;
         break;
     case 'E':
         persistence = min(0.9, persistence + 0.05);
+		cout << "PERLIN: persistence: " << persistence << endl;
         break;
     case 'e':
         persistence = max(0.1, persistence - 0.05);
+		cout << "PERLIN: persistence: " << persistence << endl;
         break;
     case 'F':
         f0 = min(10.0, f0 + 1.0);
+		cout << "PERLIN: frequence: " << f0 << endl;
         break;
     case 'f':
         f0 = max(1.0, f0 - 1.0);
+		cout << "PERLIN: frequence: " << f0 << endl;
         break;
 
     case '?':

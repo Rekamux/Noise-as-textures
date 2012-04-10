@@ -125,6 +125,8 @@ static float K = 1.0f;
 static float omega = 0.0;
 static float a = 0.05;
 static bool iso = true;
+
+// Phong properties
 static float diffuseRef = 0.8f;
 static float specRef = 1.5f;
 static float shininess = 16.0f;
@@ -137,7 +139,6 @@ static bool noiseProjected = false;
 static float s = 0.0;
 
 void setShaderValues () {
-	shader->bind();
 
     // wavelet
     waveletShader->setTileSize (tileSize);
@@ -392,6 +393,7 @@ void printUsage () {
          << "Keyboard commands" << endl 
          << "--------------------------------------" << endl 
          << " ?: Print help" << endl 
+		 << endl
          << " G: Switch to Gabor noise" << endl 
          << " A: (GABOR) increase the a parameter" << endl
          << " a: (GABOR) decrease the a parameter" << endl
@@ -417,6 +419,12 @@ void printUsage () {
          << " s: (WAVELET) decrease s" << endl
          << " p: (WAVELET) enable/disable noise projection" << endl
 		 <<endl
+         << " D: (ALL) increase diffuse ref" << endl
+         << " d: (ALL) decrease diffuse ref" << endl
+         << " C: (ALL) increase spec ref" << endl
+         << " c: (ALL) decrease spec ref" << endl
+         << " N: (ALL) increase shininess" << endl
+         << " n: (ALL) decrease shininess" << endl
          << " <drag>+<left button>: rotate model" << endl 
          << " <drag>+<right button>: move model" << endl
          << " <drag>+<middle button>: zoom" << endl
@@ -434,99 +442,104 @@ void key (unsigned char keyPressed, int x, int y) {
         exit (0);
         break;
 
+	// Phong
+	case 'D':
+		diffuseRef = min(2.0f, diffuseRef+0.1f);
+		break;
+	case 'd':
+		diffuseRef = max(0.0f, diffuseRef-0.1f);
+		break;
+	case 'C':
+		specRef = min(3.0f, specRef+0.1f);
+		break;
+	case 'c':
+		specRef = max(0.0f, specRef-0.1f);
+		break;
+	case 'N':
+		shininess = min(30.0f, shininess+1.0f);
+		break;
+	case 'n':
+		shininess = max(0.0f, shininess-1.0f);
+		break;
+
+
     // gabor
     case 'A':
         a = min(0.1, a + 0.01);
-        gaborShader->setARef(a);
         break;
     case 'a':
         a = max(0.001, a - 0.01);
-        gaborShader->setARef(a);
         break;
     case 'w':
         omega += M_PI/10.0;
-        gaborShader->setOmegaRef(omega);
         break;
     case 'i':
         iso = !iso;
-        gaborShader->setIsoRef(iso);
         break;
 
     // Noise type
     case 'P':
 		shader = perlinShader;
+		shader->bind();
         break;
     case 'W':
 		shader = waveletShader;
+		shader->bind();
         break;
     case 'G':
 		shader = gaborShader;
+		shader->bind();
         break;
 
     // Wavelet
     case 'B':
         nbands = min(5, nbands + 1);
-        waveletShader->setnBandsRef(nbands);
         break;
     case 'b':
         nbands = max(1, nbands - 1);
-        waveletShader->setnBandsRef(nbands);
         break;
     case 'R':
         firstBand = min(0, firstBand + 1);
-        waveletShader->setfirstBand(firstBand);
         break;
     case 'r':
         firstBand = max(-10, firstBand - 1);
-        waveletShader->setfirstBand(firstBand);
         break;
     case 'T':
         tileSize = min(6, tileSize + 2);
-        waveletShader->setTileSize(tileSize);
         break;
     case 't':
         tileSize = max(2, tileSize - 2);
-        waveletShader->setTileSize(tileSize);
         break;
     case 'p':
         noiseProjected = !noiseProjected;
-        waveletShader->setNoiseprojected(noiseProjected);
 		cout << "Is noise projected: " << noiseProjected << endl;
         break;
     case 'S':
         s = min(0.0, s + 1.0);
-        waveletShader->sets(s);
         break;
     case 's':
         s = max(-10.0, s - 1.0);
-        waveletShader->sets(s);
         break;
 
 
     // perlin
     case 'O':
         nbOctave = min(8, nbOctave + 1);
-        perlinShader->setnbOctave(nbOctave);
         break;
     case 'o':
         nbOctave = max(1, nbOctave - 1);
-        perlinShader->setnbOctave(nbOctave);
         break;
     case 'E':
         persistence = min(0.9, persistence + 0.05);
-        perlinShader->setPersistence(persistence);
         break;
     case 'e':
         persistence = max(0.1, persistence - 0.05);
-        perlinShader->setPersistence(persistence);
         break;
     case 'F':
         f0 = min(10.0, f0 + 1.0);
-        perlinShader->setF0(f0);
         break;
     case 'f':
         f0 = max(1.0, f0 - 1.0);
-        perlinShader->setF0(f0);
         break;
 
     case '?':

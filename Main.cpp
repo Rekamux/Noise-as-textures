@@ -392,10 +392,31 @@ void printUsage () {
          << "Keyboard commands" << endl 
          << "--------------------------------------" << endl 
          << " ?: Print help" << endl 
-         << " a: increase the a parameter in the gabor kernel" << endl
-         << " b: decrease the a parameter in the gabor kernel" << endl
-         << " i: isometric noise <--> anisometric noise" << endl
-         << " w: increase the omega0 (only useful with anisotropic noise)" << endl
+         << " G: Switch to Gabor noise" << endl 
+         << " A: (GABOR) increase the a parameter" << endl
+         << " a: (GABOR) decrease the a parameter" << endl
+         << " i: (GABOR) isometric noise <--> anisometric noise" << endl
+         << " w: (GABOR) increase the omega0 (only useful with anisotropic noise)" << endl
+		 << endl
+         << " P: Switch to Perlin noise" << endl 
+         << " O: (PERLIN) increase the number of octaves" << endl
+         << " o: (PERLIN) decrease the number of octaves" << endl
+         << " E: (PERLIN) increase the persistence" << endl
+         << " e: (PERLIN) decrease the persistence" << endl
+         << " F: (PERLIN) increase the frequence" << endl
+         << " f: (PERLIN) decrease the frequence" << endl
+		 <<endl
+         << " P: Switch to Wavelet noise" << endl 
+         << " B: (WAVELET) increase the number of bands" << endl
+         << " b: (WAVELET) decrease the number of bands" << endl
+         << " R: (WAVELET) increase the first band" << endl
+         << " r: (WAVELET) decrease the first band" << endl
+         << " T: (WAVELET) increase the tile size" << endl
+         << " t: (WAVELET) decrease the tile size" << endl
+         << " S: (WAVELET) increase s" << endl
+         << " s: (WAVELET) decrease s" << endl
+         << " p: (WAVELET) enable/disable noise projection" << endl
+		 <<endl
          << " <drag>+<left button>: rotate model" << endl 
          << " <drag>+<right button>: move model" << endl
          << " <drag>+<middle button>: zoom" << endl
@@ -470,6 +491,7 @@ void key (unsigned char keyPressed, int x, int y) {
     case 'p':
         noiseProjected = !noiseProjected;
         waveletShader->setNoiseprojected(noiseProjected);
+		cout << "Is noise projected: " << noiseProjected << endl;
         break;
     case 'S':
         s = min(0.0, s + 1.0);

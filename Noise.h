@@ -127,29 +127,3 @@ class Wavelet: public Noise {
     float wProjectedNoise(const Vec3Df &p, const Vec3Df &normal);
     float multibandNoise(const Vec3Df &p, const Vec3Df *normal);
 };
-
-/******************************************************************************/
-
-class Perlin: Noise {
-  private:
-    const int dim;
-  public:
-    float fo, p;
-    int n;
-
-    Perlin(int dimension, float fo, float persistence, float nbIterations):
-      dim(dimension), fo(fo), p(persistence), n(nbIterations) {}
-    float compute(float x, float y, float z=0, float t=0);
-
-  private:
-    static inline float interpolate(float a, float b, float x) {
-      return cosineInterpolation(a, b, x);
-    }
-
-    static inline float noise(int x, int y=0, int z=0, int t=0);
-    static float smoothNoise(float x, float y);
-    static float interpolatedNoise_smooth(float x, float y);
-    static float interpolatedNoise(float x, float y, int z=0, int t=0);
-    static float interpolatedNoise(float x, float y, float z, int t=0);
-    static float interpolatedNoise(float x, float y, float z, float t);
-};

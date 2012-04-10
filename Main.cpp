@@ -137,6 +137,8 @@ static bool noiseProjected = false;
 static float s = 0.0;
 
 void setShaderValues () {
+	shader->bind();
+
     // wavelet
     waveletShader->setTileSize (tileSize);
     waveletShader->setnBandsRef (nbands);

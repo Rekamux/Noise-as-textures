@@ -166,7 +166,7 @@ void main(void) {
 
 	// GABOR NOISE
 	float scale = 3.0 * sqrt(variance());
-	float noise_gabor = 0.5 + 0.5 * GaborNoise(P.x*100, P.y*100)/scale;
+	float noise_gabor = 0.5 + 0.5 * GaborNoise(P.x*1000.0, P.y*1000.0)/scale;
 	gl_FragColor.rgb += noise_gabor;
 
 

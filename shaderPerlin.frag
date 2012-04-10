@@ -131,8 +131,8 @@ float PerlinNoise_4D(float x, float y, float z, float t)
 void main(void) {
 	gl_FragColor = vec4 (0.0, 0.0, 0.0, 1);
 
-	vec3 c1 = vec3(0.5, 0.5, 0.7); // shiny grey
-	vec3 c2 = vec3(0.3,0.3,0.3); // white
+	vec3 c1 = vec3(0.7, 0.7, 0.7); // shiny grey
+	vec3 c2 = vec3(0.0, 0.0, 0.0); // white
 	vec3 p = vec3 (gl_ModelViewMatrix * P);
 
 	// PERLIN NOISE

@@ -83,7 +83,7 @@ class PerlinShader : public PhongShader {
 class WaveletShader : public PhongShader
 {
 	public:
-		WaveletShader () { init ("shader.vert", "shaderWavelet.frag"); }
+		WaveletShader () { this->init ("shader.vert", "shaderWavelet.frag"); }
 		inline virtual ~WaveletShader() {}
 
 		// Wavelet properties
@@ -115,13 +115,14 @@ class WaveletShader : public PhongShader
 			PhongShader::init(vertexShaderFilename, fragmentShaderFilename);
 
 			// wavelet uniform var
-			arrayLocation = getUniLoc ("noiseData");
+			//arrayLocation = getUniLoc ("noiseData");
 			nBandsLocation = getUniLoc ("nbands");
 			firstBandLocation = getUniLoc ("firstBand");
-			tileSizeLocation = getUniLoc ("noiseTileSize");
+			//tileSizeLocation = getUniLoc ("noiseTileSize");
 			noiseProjectedLocation = getUniLoc ("noiseProjected");
 			sLocation = getUniLoc ("s");
-
+      setNoiseData(2);
+			glUniform1iARB (tileSizeLocation, 2);
 		}
 
 		void setNoiseData(int s) {

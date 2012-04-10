@@ -417,8 +417,8 @@ void printUsage () {
 		<< " b: (WAVELET) decrease the number of bands" << endl
 		<< " R: (WAVELET) increase the first band" << endl
 		<< " r: (WAVELET) decrease the first band" << endl
-		<< " T: (WAVELET) increase the tile size" << endl
-		<< " t: (WAVELET) decrease the tile size" << endl
+		/*<< " T: (WAVELET) increase the tile size" << endl
+		<< " t: (WAVELET) decrease the tile size" << endl*/
 		<< " S: (WAVELET) increase s" << endl
 		<< " s: (WAVELET) decrease s" << endl
 		<< " p: (WAVELET) enable/disable noise projection" << endl
@@ -525,14 +525,14 @@ void key (unsigned char keyPressed, int x, int y) {
 			firstBand = max(-10, firstBand - 1);
 			cout << "WAVELET: first bands: " << firstBand << endl;
 			break;
-		case 'T':
+		/*case 'T':
 			tileSize = min(6, tileSize + 2);
 			cout << "WAVELET: tile size: " << tileSize << endl;
 			break;
 		case 't':
 			tileSize = max(2, tileSize - 2);
 			cout << "WAVELET: tile size: " << tileSize << endl;
-			break;
+			break;*/
 		case 'p':
 			noiseProjected = !noiseProjected;
 			cout << "WAVELET: is noise projected: " << noiseProjected << endl;

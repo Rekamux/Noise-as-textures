@@ -539,7 +539,7 @@ void key (unsigned char keyPressed, int x, int y) {
 			break;
 		case 'S':
 			s = min(0.0, s + 1.0);
-			cout << "WAVELET: tile size: " << tileSize << endl;
+			cout << "WAVELET: s: " << s << endl;
 			break;
 		case 's':
 			s = max(-10.0, s - 1.0);

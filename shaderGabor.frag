@@ -45,6 +45,8 @@ float number_of_impulses_per_kernel = 64.0;
 float radius = sqrt(-log(0.05) / 3.14159265) / a;
 float impulseDensity = number_of_impulses_per_kernel / (3.14159265 * radius * radius);
 
+int MAX_RAND = (((1<<30) -1)<<1)+1;
+
 ///////////////////////////////////////////////
 ///////
 ///////           GABOR NOISE
@@ -55,12 +57,12 @@ void seed(uint s_) {
 }
 
 uint random() { 
-    seed_kernel *= 3039177861u; 
-    return seed_kernel; 
+    seed_kernel = seed_kernel*1103515245u+12345u;
+    return seed_kernel&MAX_RAND;
 }
 
 float uniform_0_1() { 
-    return float(random()) / 4294967295.0; 
+    return float(random()) / MAX_RAND;
 }
 
 float unif(float min, float max) { 
